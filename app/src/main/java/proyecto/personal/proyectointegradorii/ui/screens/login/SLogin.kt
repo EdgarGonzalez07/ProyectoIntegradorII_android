@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,15 +37,30 @@ import proyecto.personal.proyectointegradorii.viewmodels.login.LoginViewModel
 
 @Composable
 fun ScreenLogin(
-    navController: NavController,
-    viewModel: LoginViewModel = viewModel()
+    navController: NavController
 ) {
+    val context = LocalContext.current
+
+    val viewModel: LoginViewModel = viewModel(
+        factory = androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory(
+            context.applicationContext as android.app.Application
+        )
+    )
 
     val email by viewModel.email.collectAsState()
     val emailError by viewModel.emailError.collectAsState()
     val password by viewModel.password.collectAsState()
     val passwordError by viewModel.passwordError.collectAsState()
-    val isLoggedIn by viewModel.isLoggedIn.collectAsState()
+    val isLoggedIn by viewModel.loginSuccess.collectAsState()
+
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            navController.navigate("Main") {
+                popUpTo("Login") { inclusive = true }
+            }
+        }
+    }
+
     val errorMessage by viewModel.generalErrorMessage.collectAsState()
 
     Column(

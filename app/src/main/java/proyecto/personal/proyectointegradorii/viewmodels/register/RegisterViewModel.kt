@@ -1,35 +1,50 @@
 package proyecto.personal.proyectointegradorii.viewmodels.register
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import proyecto.personal.proyectointegradorii.data.repositories.MockUserRepository
+import proyecto.personal.proyectointegradorii.data.model.AppDatabase
+import proyecto.personal.proyectointegradorii.data.model.Usuario
 import proyecto.personal.proyectointegradorii.data.repositories.UserRepository
 
-class RegisterViewModel(
-    private val repository: UserRepository = MockUserRepository()
-): ViewModel() {
+class RegisterViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val dao = AppDatabase.getDatabase(application).usuarioDao()
+    private val repository = UserRepository()
 
     private val _name = MutableStateFlow("")
     val name = _name.asStateFlow()
+
     private val _email = MutableStateFlow("")
     val email = _email.asStateFlow()
+
     private val _password = MutableStateFlow("")
     val password = _password.asStateFlow()
+
     private val _confirmPassword = MutableStateFlow("")
     val confirmPassword = _confirmPassword.asStateFlow()
-    private val _isRegister = MutableStateFlow(false)
-    val isRegister = _isRegister.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
+
+    private val _success = MutableStateFlow(false)
+    val success = _success.asStateFlow()
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage = _errorMessage.asStateFlow()
+
     private val _errorName = MutableStateFlow<String?>(null)
     val errorName = _errorName.asStateFlow()
+
     private val _errorEmail = MutableStateFlow<String?>(null)
     val errorEmail = _errorEmail.asStateFlow()
+
     private val _errorPassword = MutableStateFlow<String?>(null)
     val errorPassword = _errorPassword.asStateFlow()
+
     private val _errorConfirmPassword = MutableStateFlow<String?>(null)
     val errorConfirmPassword = _errorConfirmPassword.asStateFlow()
 
@@ -56,60 +71,52 @@ class RegisterViewModel(
     fun registrar() {
         var isValid = true
 
-        //Validacion del Nombre
         if (_name.value.isBlank()) {
-            _errorName.value = "Este campo es obligatorio."
-            isValid = false
-        } else if (!_name.value.trim().contains(" ")) {
-            _errorName.value = "El campo debe contener un nombre y un apellido"
+            _errorName.value = "Nombre obligatorio"
             isValid = false
         }
 
-        //Validacion del Email
         if (_email.value.isBlank()) {
-            _errorEmail.value = "El correo electrónico es obligatorio."
-            isValid = false
-        } else if (!_email.value.endsWith("@gmail.com")) {
-            _errorEmail.value = "El correo electrónico debe ser @gmail.com"
+            _errorEmail.value = "Correo obligatorio"
             isValid = false
         }
 
-        //Validacion de la Contraseña
-        if (_password.value.isBlank()) {
-            _errorPassword.value = "La contraseña es obligatoria."
-            isValid = false
-        } else if (_password.value.length < 8) {
-            _errorPassword.value = "La contraseña debe tener al menos 8 caracteres"
+        if (_password.value.length < 8) {
+            _errorPassword.value = "Mínimo 8 caracteres"
             isValid = false
         }
 
-        //Validacion de la Confirmacion de la Contraseña
-        if (_confirmPassword.value.isBlank()) {
-            _errorConfirmPassword.value = "Confirma tu contraseña."
-            isValid = false
-        } else if (_password.value != _confirmPassword.value) {
-            _errorConfirmPassword.value = "Las contraseñas no coinciden."
+        if (_password.value != _confirmPassword.value) {
+            _errorConfirmPassword.value = "No coinciden"
             isValid = false
         }
 
         if (!isValid) return
 
         viewModelScope.launch {
-            _isRegister.value = true
+            _isLoading.value = true
 
-            val resultado = repository.register(
-                _name.value.trim(),
-                _email.value,
-                _password.value
+            val successRegister = repository.register(
+                Usuario(
+                    nombre_completo = _name.value,
+                    correo_electronico = _email.value,
+                    contrasena = _password.value
+                )
             )
 
-            resultado.onSuccess { nuevoUsuario ->
-                println("¡Registro exitoso! Bienvenido ${nuevoUsuario.nombreCompleto}, tu ID es el ${nuevoUsuario.id}")
-            }.onFailure { excepcion ->
-                _errorMessage.value = excepcion.message ?: "Error desconocido"
+            if (successRegister) {
+                _success.value = true
+            } else {
+                _errorMessage.value = "El correo ya existe"
             }
 
-            _isRegister.value = false
+            _isLoading.value = false
+
+            if (successRegister) {
+                println("✅ Usuario registrado correctamente")
+            } else {
+                println("❌ El usuario ya existe")
+            }
         }
     }
 }

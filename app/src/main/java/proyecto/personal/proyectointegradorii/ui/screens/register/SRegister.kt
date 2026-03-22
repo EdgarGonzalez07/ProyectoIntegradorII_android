@@ -37,9 +37,16 @@ import proyecto.personal.proyectointegradorii.viewmodels.register.RegisterViewMo
 
 @Composable
 fun ScreenRegister(
-    navController: NavController,
-    viewModel: RegisterViewModel = viewModel()
+    navController: NavController
 ) {
+    val context = LocalContext.current
+
+    val viewModel: RegisterViewModel = viewModel(
+        factory = androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory(
+            context.applicationContext as android.app.Application
+        )
+    )
+
     val name by viewModel.name.collectAsState()
     val errorName by viewModel.errorName.collectAsState()
     val email by viewModel.email.collectAsState()
@@ -48,7 +55,7 @@ fun ScreenRegister(
     val errorPassword by viewModel.errorPassword.collectAsState()
     val confirmPassword by viewModel.confirmPassword.collectAsState()
     val errorConfirmPassword by viewModel.errorConfirmPassword.collectAsState()
-    val isRegister by viewModel.isRegister.collectAsState()
+    val isRegister by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
     Column(

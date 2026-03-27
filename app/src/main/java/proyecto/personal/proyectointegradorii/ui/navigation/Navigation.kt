@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import proyecto.personal.proyectointegradorii.ui.screens.internal.SMain
+import proyecto.personal.proyectointegradorii.ui.screens.internal.account.SAccount
 import proyecto.personal.proyectointegradorii.ui.screens.login.ScreenLogin
 import proyecto.personal.proyectointegradorii.ui.screens.recover.SRecoverPassword
 import proyecto.personal.proyectointegradorii.ui.screens.register.ScreenRegister
@@ -28,8 +29,12 @@ fun Navigation(){
             SRecoverPassword(navController)
         }
 
+        composable("Account"){
+            SAccount(navController, navController)
+        }
+
         composable("Main"){
-            SMain()
+            SMain(navController)
         }
     }
 

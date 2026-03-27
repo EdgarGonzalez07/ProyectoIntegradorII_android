@@ -9,6 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,7 +22,8 @@ import proyecto.personal.proyectointegradorii.ui.screens.internal.points.SPoints
 import proyecto.personal.proyectointegradorii.ui.screens.internal.scan.SScan
 
 @Composable
-fun SMain() {
+fun SMain(rootNavController: NavHostController) {
+
     val navController = rememberNavController()
     var showCategories by remember { mutableStateOf(false) }
 
@@ -34,17 +37,11 @@ fun SMain() {
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { SHome() }
+            composable("home") { SHome(navController, rootNavController) }
             composable("cart") { SCart() }
             composable("scan") { SScan() }
             composable("offers") { SOffers() }
             composable("points") { SPoints() }
         }
     }
-}
-
-@Preview
-@Composable
-fun PSM(){
-    SMain()
 }

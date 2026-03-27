@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import proyecto.personal.proyectointegradorii.ui.components.buttons.ButtonAccount
 import proyecto.personal.proyectointegradorii.ui.components.cards.account.CardAccountOptions
 import proyecto.personal.proyectointegradorii.ui.components.cards.account.CardHeaderAccount
@@ -27,7 +28,8 @@ import proyecto.personal.proyectointegradorii.ui.theme.BackgroundColor
 
 @Composable
 fun SAccount(
-    navController: NavController
+    navController: NavController,
+    rootNavController: NavController
 ) {
     Scaffold(
         bottomBar = {
@@ -75,7 +77,11 @@ fun SAccount(
                         ButtonAccount(
                             icon = Icons.Default.Logout,
                             text = "Cerrar Sesión",
-                            onClick = {}
+                            onClick = {
+                                rootNavController.navigate("Login") {
+                                    popUpTo(0)
+                                }
+                            }
                         )
                     }
                 }
@@ -84,8 +90,8 @@ fun SAccount(
     }
 }
 
-@Preview
+/*@Preview
 @Composable
 fun PSA(){
     SAccount(navController = NavController(LocalContext.current))
-}
+}*/

@@ -111,12 +111,6 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
             }
 
             _isLoading.value = false
-
-            if (successRegister) {
-                println("✅ Usuario registrado correctamente")
-            } else {
-                println("❌ El usuario ya existe")
-            }
         }
     }
 }
